@@ -37,7 +37,7 @@ The application will calculate 10%, 25% 33%, 50%, and 75% of the goal and output
 ## Learnings
 Taking on this project pushed me to explore different technologies, many of which were new to me. For this project, I used Django as a web framework which gave me the chance to see how it was different to Flask. I also learned to implement AJAX to dynamically update the web page, rather than rendering the entire page with each update. Understanding how this worked with the backend through the POST method was enlightening and was a significant learning experience. 
 
-Moreover, I also wanted to visualise the projections through a graph, and so I picked up Chart.js to render the histogram. Ultimately, this project encouraged me to learn new technologies and approaches, which I am excited to apply in future projects.
+Moreover, I also wanted to visualise the projections through a graph, and so I picked up Chart.js to render the histogram. I found the process of creating a stacked histogram and customising the tooltip to be particularly impactful. Ultimately, this project encouraged me to learn new technologies and approaches, which I am excited to apply in future projects.
 
 ## Future Considerations
 The application functions as intended, but there are a few areas for improvement. For instance, adding an option for fortnightly frequencies could enhance customisation for an improved user experience. Additionally, taking into account other variables such as inflation can provide a more realistic projection of returns. I also plan to improve the accuracy of the projected estimations for longer timeframes.
