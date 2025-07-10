@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+        <title>FIRE</title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="/static/myapp/style.css">
+        <link rel="icon" href="/static/myapp/Fire.png">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    </head>
+
+    <body>
+
+        <div class="container">
+            <img src="/static/myapp/Fire.png" height="200px">
+
+            <div class="text-container">
+                <h1>FIRE</h1>
+
+                <p>This web-based application enables you to calculate your unique timeline of investing to live the FIRE lifestyle.</p>
+                <p><strong>"Financial Independence, Retire Early"</strong></p>
+
+                <p>This application was developed as a passion project, combining my interests in full-stack development and personal finance.
+                    Through my own financial journey, I discovered that setting measurable goals and celebrating the small wins are essential for maintaining motivation and ensuring consistent progress.
+                    Inspired by this experience, I developed this tool to visualise my personal timeline and support others to succeed. Enjoy using this application and good luck on your journey!.
+                </p>
+
+                <p>Please input the required information, and this application will calculate your key milestones along with the timeframe required to achieve your goal.
+                    Kindly note that this application does not collect any personal data and provides only an estimation, assuming consistent investments over the long term.</p>
+            </div>
+
+        </div>
+
+
+        <div class="calculator-container">
+            
+            <div class="calculator-content-container">
+                <h2>Investment Milestone and Timeline Calculator</h2>
+            </div>
+
+            <form id="my-form" method="POST" action="ajax-form/">
+                {% csrf_token %}
+
+
+                <div class="input-container">
+                    <div class="input-label-field">
+                        <label class="calculator-label">Principle amount:</label>
+                    </div>
+
+                    <div class="input-field">
+                        <input name="initial_amount" id="initial-amount" class="input" type="number" placeholder="Initial amount ($)" min="1" required>
+                    </div>
+                </div>
+
+
+                <div class="input-container">
+                    <div class="input-label-field">
+                        <label class="calculator-label">Goal amount:</label>
+                    </div>
+
+                    <div class="input-field">
+                        <input name="final_amount" id="final-amount" class="input" type="number" placeholder="Final amount ($)" min="1" required>
+                    </div>
+                </div>
+
+
+                <div class="input-container">
+                    <div class="input-label-field">
+                        <label class="calculator-label">Investment amount:</label>
+                    </div>
+
+                    <div class="input-field">
+                        <input name="invest_amount" id="invest-amount" class="input" type="number" placeholder="Contribution amount ($)" min="1" required>
+                    </div>
+                </div>
+
+
+                <div class="input-container">
+                    <div class="input-label-field">
+                        <label class="calculator-label">Frequency of investments:</label>
+                    </div>
+                
+                    <div class="input-field">
+                        <select name="frequency_option" class="select-option" id="frequency-option">
+                            <option value="per-week"> Weekly</option>
+                            <option value="per-month" selected> Monthly</option>
+                            <option value="per-year"> Yearly</option>
+                        </select>
+                    </div>
+                </div>
+
+
+                <div class="input-container">
+                    <div class="input-label-field">
+                        <label class="calculator-label">Investment growth percentage: </label>
+                    </div>
+                    
+                    <div class="input-field">
+                        <input name="growth" id="growth" class="input" type="number" step="0.01" placeholder="Growth rate (%)" min="1" required> 
+                    </div>
+                </div>
+
+
+                <div class="calculator-content-container">
+                    <button id="submit-button" type="submit">Submit</button>
+                </div>
+
+            </form>
+
+        </div>
+
+
+        <div class="container">
+            <table>
+                <thead>
+                    <th>Milestone 1 (10%)</th>
+                    <th>Milestone 2 (25%)</th>
+                    <th>Milestone 3 (33%)</th>
+                    <th>Milestone 4 (50%)</th>
+                    <th>Milestone 5 (75%)</th>
+                    <th>Final Goal (100%)</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><p id="goal-1"></p></td>
+                        <td><p id="goal-2"></p></td>
+                        <td><p id="goal-3"></p></td>
+                        <td><p id="goal-4"></p></td>
+                        <td><p id="goal-5"></p></td>
+                        <td><p id="goal-6"></p></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <div class="graph-container">
+            <canvas id="histogram"></canvas>
+        </div>
+
+
+        <div id="response"></div>
+        
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                const form = document.getElementById('my-form');
+
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    const formData = new FormData(form);
+                    //console.log(formData);
+
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        } 
+                    })
+                    .then(response => {
+                        //console.log(response);
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data) {
+                            document.getElementById('goal-1').innerHTML = `<p><strong>$${data.milestone_1[0]}: </strong> ${data.milestone_1[1]} Y, ${data.milestone_1[2]} M</p>`;
+                            document.getElementById('goal-2').innerHTML = `<p><strong>$${data.milestone_2[0]}: </strong> ${data.milestone_2[1]} Y, ${data.milestone_2[2]} M</p>`;
+                            document.getElementById('goal-3').innerHTML = `<p><strong>$${data.milestone_3[0]}: </strong> ${data.milestone_3[1]} Y, ${data.milestone_3[2]} M</p>`;
+                            document.getElementById('goal-4').innerHTML = `<p><strong>$${data.milestone_4[0]}: </strong> ${data.milestone_4[1]} Y, ${data.milestone_4[2]} M</p>`;
+                            document.getElementById('goal-5').innerHTML = `<p><strong>$${data.milestone_5[0]}: </strong> ${data.milestone_5[1]} Y, ${data.milestone_5[2]} M</p>`;
+                            document.getElementById('goal-6').innerHTML = `<p><strong>$${data.milestone_6[0]}: </strong> ${data.milestone_6[1]} Y, ${data.milestone_6[2]} M</p>`;
+                        
+                            var exponent_data = data.exponent_graph;
+                            var linear_data = data.linear_graph;
+                            
+                            //console.log("exdata: " + exponent_data);
+                            //console.log("lidata: " + linear_data);
+                            
+                            createChart(exponent_data, linear_data);
+
+                        } else if (data.error) {
+                            document.getElementById('response').innerHTML = `<p>${data.error}</p>`;
+                        }
+                    })
+                    .catch (error => {
+                        document.getElementById('response').innerHTML = `<p>Error ${error.message}</p>`;
+                    })
+                })
+            })
+
+            // Function to create the histogram
+            let chart;
+            function createChart(exponent_data, linear_data) {
+                const context = document.getElementById('histogram').getContext('2d');
+                // Remove the previous graph if already rendered 
+                if (chart) {
+                    chart.destroy();
+                }
+                chart = new Chart(context, {
+                    type: 'bar',
+                    data: {
+                        labels: exponent_data.map((_, index) => `Year ${index}`),
+                        datasets: [
+                            {
+                                label: 'Returns',
+                                data: exponent_data,
+                                backgroundColor: '#ffe356',
+                                borderColor: '#ffe356',
+                                borderWidth: 1,
+                                order: 1,
+                                stack: false
+
+                            },
+                            {
+                                label: 'Contributions',
+                                data: linear_data,
+                                backgroundColor: '#ff5e47',
+                                borderColor: '#ff5e47',
+                                borderWidth: 1,
+                                order: 0,
+                                stack: false
+                            }
+                        ]
+                    },
+                    options: {
+                        plugins: {
+                            // Customise the tooltip to calculate the total value of investments
+                            tooltip: {
+                                enabled: true,
+                                mode: 'nearest',
+                                callbacks: {
+                                    label: (context) => {
+                                        const value = context.raw;  
+                                        const dataset = context.dataset;
+
+                                        const index = context.dataIndex;
+                                        let totalValue = 0;
+
+                                        context.chart.data.datasets.forEach(function (dataset) {
+                                            totalValue += dataset.data[index]
+                                        });
+                                        
+                                        return ` ${dataset.label}: $${value.toFixed(2)}         Total value: $${totalValue.toFixed(2)}`;
+                                        ;
+                                    }
+                                }
+                            }
+                        },
+                        // Label the x and y axis 
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Years'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Dollars ($)'
+                                },
+                                beginAtZero: true
+                            },
+                        }
+                    }
+                })
+            }
+        </script>
+
+    </body>
+
+    <div>
+        <footer>
+            <p><strong>By Edward Truong | 2025</strong></p>
+            <div style="width: 3%; display: inline-block">
+                <a href="https://www.linkedin.com/in/edwardtruong3/"><img class="link-icons" src="/static/myapp/LinkedIn.png"></a>
+            </div>
+
+            <div style="width: 3%; display: inline-block">
+                <a href="https://github.com/ET0505"><img class="link-icons" src="/static/myapp/GitHub.png"></a>
+            </div>
+        </footer>
+    </div>
+
+</html>
